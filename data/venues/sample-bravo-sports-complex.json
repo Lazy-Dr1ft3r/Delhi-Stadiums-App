@@ -1,0 +1,31 @@
+{
+  "id": "sample-bravo-sports-complex",
+  "isSample": true,
+  "name": "SAMPLE Bravo Sports Complex",
+  "aliases": [],
+  "address": "SAMPLE — fictional address, not a real venue",
+  "locality": "SAMPLE Locality B",
+  "coordinates": { "lat": 28.7, "lng": 77.1 },
+  "operator": "Other",
+  "facilities": [
+    {
+      "id": "track",
+      "type": "running_track",
+      "details": {
+        "lengthMeters": 400,
+        "surface": "cinder",
+        "floodlights": false
+      },
+      "access": {
+        "publicEntry": "open",
+        "hours": "SAMPLE — 05:30–09:30"
+      },
+      "status": {
+        "state": "under_renovation",
+        "reason": "SAMPLE — resurfacing. Verified about 3 months ago, so it should show amber (stale).",
+        "lastVerified": "2026-08-15",
+        "source": "other"
+      }
+    }
+  ]
+}

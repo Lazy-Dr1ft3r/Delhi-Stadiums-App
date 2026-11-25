@@ -1,0 +1,10 @@
+{
+  "name": "Delhi Tracks",
+  "short_name": "Delhi Tracks",
+  "description": "Running tracks in Delhi with verified, dated status.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0f766e",
+  "icons": []
+}

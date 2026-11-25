@@ -1,0 +1,29 @@
+{
+  "id": "sample-charlie-ground",
+  "isSample": true,
+  "name": "SAMPLE Charlie Ground",
+  "aliases": [],
+  "address": "SAMPLE — fictional address, not a real venue",
+  "locality": "SAMPLE Locality C",
+  "coordinates": { "lat": 28.55, "lng": 77.05 },
+  "operator": "Other",
+  "facilities": [
+    {
+      "id": "track",
+      "type": "running_track",
+      "details": {
+        "lengthMeters": 300,
+        "surface": "grass"
+      },
+      "access": {
+        "publicEntry": "open"
+      },
+      "status": {
+        "state": "open",
+        "reason": "SAMPLE — verified over 180 days ago, so it should show grey (unknown).",
+        "lastVerified": "2026-03-01",
+        "source": "other"
+      }
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "id": "sample-alpha-stadium",
+  "isSample": true,
+  "name": "SAMPLE Alpha Stadium",
+  "aliases": ["SAMPLE Alpha Ground"],
+  "address": "SAMPLE — fictional address, not a real venue",
+  "locality": "SAMPLE Locality A",
+  "district": "SAMPLE District",
+  "coordinates": { "lat": 28.59, "lng": 77.23 },
+  "operator": "Other",
+  "facilities": [
+    {
+      "id": "main-track",
+      "type": "running_track",
+      "details": {
+        "lengthMeters": 400,
+        "surface": "synthetic",
+        "lanes": 8,
+        "spikesAllowed": true,
+        "floodlights": true,
+        "warmupArea": true,
+        "fieldEventsArea": true,
+        "indoor": false
+      },
+      "access": {
+        "publicEntry": "membership",
+        "fees": "SAMPLE — ₹0/day",
+        "hours": "SAMPLE — 06:00–09:00, 16:00–19:00",
+        "coachingAvailable": true,
+        "notes": "SAMPLE data for development. Status is recent, so it should show as fresh."
+      },
+      "status": {
+        "state": "open",
+        "lastVerified": "2026-11-10",
+        "source": "other"
+      }
+    },
+    {
+      "id": "warmup-track",
+      "type": "running_track",
+      "details": {
+        "lengthMeters": 200,
+        "surface": "unknown"
+      },
+      "access": {
+        "publicEntry": "unknown"
+      },
+      "status": {
+        "state": "unknown",
+        "reason": "SAMPLE — second facility at the same venue, mostly unknown fields",
+        "lastVerified": "2026-11-10",
+        "source": "other"
+      }
+    }
+  ]
+}
