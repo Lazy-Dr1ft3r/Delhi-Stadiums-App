@@ -32,9 +32,11 @@ Dev machine is Windows; the default terminal may be Windows PowerShell 5.1, whic
 - **Data is JSON in the repo for the pilot.** There is one file per venue: `data/venues/<id>.json`, and `id` must equal the file name. Every edit is a reviewable git diff. A move to Supabase (Postgres + PostGIS) is planned for later, so keep data access behind `src/lib/data.ts`.
 - **`src/lib/schema.ts` is the source of truth.** Zod schemas define the model and every TS type is inferred from them (`z.infer`). Never hand-write a parallel type. The model is **Venue → Facilities[]**. `facilitySchema` is a discriminated union on `type`, which is only `running_track` today. To add a type (pool, court…), add a details schema plus a facility schema to the union. Objects are `z.strictObject`, so unknown keys fail.
 - **`src/lib/data.ts`** loads and validates every venue file (server-only, uses `fs`). `getAllVenues()` throws on any invalid file, so pages that call it fail the build. `validateVenueDir()` collects all errors; the validate script and tests use it. Its `fs`/`path` calls carry `/*turbopackIgnore: true*/` hints, which stop Turbopack from tracing the whole project into the server bundle. Keep the hints; they're safe only while venue data is read at build time (static pages).
-- **Pages** are server components that read data at build time. Venue detail pages (`src/app/venues/[id]`, M1) should be statically generated with `generateStaticParams`.
-- **Planned `lib/` modules** (brief §7): `filters.ts` (pure filter/sort), `geo.ts` (distance), `status.ts` (staleness: amber after 60 days, grey "unknown" after 180 days since `lastVerified`). Keep them pure and unit-tested.
-- **Map** (M1): Leaflet + OpenStreetMap through `react-leaflet`. These must be client-only components (`"use client"` plus dynamic import with `ssr: false`) because Leaflet touches `window`.
+- **Pages** are server components that read data at build time and are fully static: `/` and `/venues/[id]` (`generateStaticParams`, `dynamicParams = false`, so unknown ids 404).
+- **Staleness is computed in the browser, not at build time.** Static HTML would otherwise freeze "fresh" forever. Pages pass `buildDay` (YYYY-MM-DD) to client components; `useToday(buildDay)` (`src/components/useToday.ts`, via `useSyncExternalStore`) renders with the build day on the server and switches to the viewer's local date on hydration. Anything time-dependent (badges, "Open now" filter, marker colours) must take `now` from `useToday`, never `new Date()` inline.
+- **Pure `lib/` modules, all unit-tested:** `status.ts` (fresh ≤60 days, stale/amber ≤180, then expired → shown as grey "Unknown"; `getStatusDisplay` is the single source of badge label/tone/warning), `filters.ts` (all facility-level filters must hold on the _same_ facility; positive filters never match unknown values; sorts by distance when an origin is given), `geo.ts` (haversine, Google Maps directions URL), `labels.ts` (enum labels and `yesNo()`, which renders `undefined` as "Not confirmed").
+- **Explore** (`src/components/explore/Explore.tsx`) is the client component that owns filter, list/map and "Near me" state. The card/marker for a venue shows the first running track that matched the filters.
+- **Map**: Leaflet + OpenStreetMap through `react-leaflet`, in `src/components/map/VenueMap.tsx`. It must stay client-only (loaded with `next/dynamic` and `ssr: false`) because Leaflet touches `window`. Markers are `CircleMarker`s coloured by status tone (`components/venue/tone.ts`), which avoids Leaflet's broken default icon images under bundlers.
 
 ## Data rules (critical)
 
@@ -49,7 +51,8 @@ Dev machine is Windows; the default terminal may be Windows PowerShell 5.1, whic
 - TypeScript strict with `noUncheckedIndexedAccess`. The import alias `@/*` maps to `src/*`.
 - Put logic in pure functions in `src/lib/` with Vitest tests. Keep components thin.
 - Mobile-first: it must be usable one-handed, outdoors, on a slow connection. Use Tailwind v4 (`@import "tailwindcss"` in `src/styles/globals.css`, configured through PostCSS).
-- **Don't add new dependencies without asking.** Leaflet/react-leaflet are approved for M1 but not installed yet.
+- **Don't add new dependencies without asking.**
+- E2E tests (`tests/e2e`) run against the SAMPLE venues, so they will need updating when sample data is removed in M2.
 - Work one milestone at a time with small commits. Run `npm run check` before saying a task is done.
 
 ## Decisions
@@ -63,13 +66,15 @@ Still open (brief §10), so ask before building anything that depends on them:
 - NCT Delhi only, or NCR too. The coordinate bounds in `schema.ts` are a loose NCR box until this is decided.
 - English only, or English + Hindi
 
-## Current milestone: M0 — Scaffold
+## Current milestone: M1 — Read-only pilot
 
-Done: tooling configs, Zod schema, data loader, `validate-data` script, 3 SAMPLE venues (deliberately fresh / ~3 months / >180 days old, to exercise staleness), unit + smoke tests, CI workflow, placeholder home page, PWA manifest stub. Verified 2026-11-25: `npm run check`, `format:check`, `build` (no warnings) and `test:e2e` all pass.
+Deployed at https://delhi-stadiums-app.vercel.app/ (Vercel auto-deploys `main`). Repo: https://github.com/Lazy-Dr1ft3r/Delhi-Stadiums-App. Commits in this repo use the GitHub noreply email (local git config).
 
-Remaining for M0:
+M0 done (2026-11-25). M1 done (2026-11-25): status/geo/filters/labels modules with tests; Explore page (search, filter chips, Near me, list/map toggle); venue detail page (status badge with verified date + source, track specs, access, directions, disabled "Report an update" placeholder for M3); 404 page. `npm run check`, `build` and `test:e2e` pass.
 
-- Optional pre-commit hook that runs validate-data (would need a dependency such as husky or simple-git-hooks; ask first).
-- First commit and push to GitHub so CI runs.
+Open items:
 
-Next (M1): `status.ts`, `geo.ts`, `filters.ts` with tests, then the Explore page (list + map toggle, search, filter chips, Near me), the venue detail page, StatusBadge, and a Vercel deploy.
+- Vitest 3 has `npm audit` advisories (dev-only, not shipped). The fix is a major upgrade to Vitest 5; ask before doing it.
+- Optional pre-commit hook running validate-data (needs a dependency such as simple-git-hooks; ask first).
+
+Next (M2): the user supplies verified venue data; remove the SAMPLE venues and update e2e tests. Then M3: "Report an update" form (needs the submissions decision above) and the About/Data page.
